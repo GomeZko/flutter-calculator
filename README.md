@@ -28,10 +28,13 @@ The app supports basic arithmetic operations and includes an additional **kilome
 
 ---
 
+
 ## Screenshots
 
-![Calculator App](images/app_screenshot.png)
-![Calculator App](images/miles.png)
+<p align="center">
+  <img src="images/app_screenshot.png" width="250">
+  <img src="images/miles.png" width="250">
+</p>
 
 ---
 
