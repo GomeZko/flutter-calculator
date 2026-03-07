@@ -4,7 +4,7 @@ import 'package:math_expressions/math_expressions.dart';
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _HomePageState();
@@ -27,52 +27,64 @@ class _HomePageState extends State<MyHomePage> {
   String answer = '';
 
   final List<String> buttons = [
-    'C', 'DEL', '%', '/',
-    '7', '8', '9', 'x',
-    '4', '5', '6', '-',
-    '1', '2', '3', '+',
-    'ANS', '0', '.', '=',
+    'C','DEL','%','/',
+    '7','8','9','x',
+    '4','5','6','-',
+    '1','2','3','+',
+    'ANS','0','.','='
   ];
 
-  void buttonTapped(String buttonText) {
+  void buttonTapped(String buttonText){
     setState(() {
-      if (buttonText == 'C') {
+
+      if(buttonText == 'C'){
         userInput = '';
         answer = '';
       }
-      else if (buttonText == 'DEL') {
-        if (userInput.isNotEmpty) {
-          userInput = userInput.substring(0, userInput.length - 1);
+
+      else if(buttonText == 'DEL'){
+        if(userInput.isNotEmpty){
+          userInput = userInput.substring(0,userInput.length-1);
         }
       }
-      else if (buttonText == '=') {
+
+      else if(buttonText == '='){
         calculateResult();
       }
-      else if (buttonText == 'ANS') {
+
+      else if(buttonText == 'ANS'){
         userInput += answer;
       }
-      else {
+
+      else{
         userInput += buttonText;
       }
+
     });
   }
 
-  void calculateResult() {
-    String finalInput = userInput.replaceAll('x', '*');
+  void calculateResult(){
 
-    try {
+    String finalInput = userInput.replaceAll('x','*');
+
+    try{
+
       Parser p = Parser();
       Expression exp = p.parse(finalInput);
       ContextModel cm = ContextModel();
       double eval = exp.evaluate(EvaluationType.REAL, cm);
 
       answer = eval.toString();
-    } catch (e) {
+
+    }catch(e){
+
       answer = 'Error';
+
     }
+
   }
 
-  bool isOperator(String x) {
+  bool isOperator(String x){
     return x == '%' ||
         x == '/' ||
         x == 'x' ||
@@ -84,10 +96,31 @@ class _HomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       backgroundColor: Colors.blueGrey[900],
+
+      appBar: AppBar(
+        title: const Text("Calculator"),
+        actions: [
+
+          IconButton(
+            icon: const Icon(Icons.swap_horiz),
+            onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ConverterScreen(),
+                ),
+              );
+            },
+          )
+
+        ],
+      ),
+
       body: Column(
         children: [
-          // Output screen
+
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(20),
@@ -96,12 +129,16 @@ class _HomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
+
                   Text(
                     userInput,
                     style: const TextStyle(
-                        fontSize: 30, color: Colors.white),
+                        fontSize: 30,
+                        color: Colors.white),
                   ),
-                  const SizedBox(height: 10),
+
+                  const SizedBox(height:10),
+
                   Text(
                     answer,
                     style: const TextStyle(
@@ -109,34 +146,42 @@ class _HomePageState extends State<MyHomePage> {
                         color: Colors.white,
                         fontWeight: FontWeight.bold),
                   ),
+
                 ],
               ),
             ),
           ),
 
-          // Buttons
           Expanded(
-            flex: 2,
+            flex:2,
             child: GridView.builder(
               itemCount: buttons.length,
               gridDelegate:
               const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
+                crossAxisCount:4,
               ),
-              itemBuilder: (context, index) {
+              itemBuilder:(context,index){
+
                 return MyButton(
+
                   buttonText: buttons[index],
+
                   color: isOperator(buttons[index])
                       ? Colors.orange
                       : Colors.blueGrey,
+
                   textColor: Colors.white,
-                  onTap: () {
+
+                  onTap: (){
                     buttonTapped(buttons[index]);
                   },
+
                 );
+
               },
             ),
-          ),
+          )
+
         ],
       ),
     );
@@ -150,12 +195,12 @@ class MyButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const MyButton({
-    Key? key,
+    super.key,
     this.color,
     this.textColor,
     required this.buttonText,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -178,6 +223,92 @@ class MyButton extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class ConverterScreen extends StatefulWidget {
+  const ConverterScreen({super.key});
+
+  @override
+  State<ConverterScreen> createState() => _ConverterScreenState();
+}
+
+class _ConverterScreenState extends State<ConverterScreen> {
+
+  final TextEditingController kmController = TextEditingController();
+
+  String result = '';
+
+  void convert(){
+
+    double km = double.tryParse(kmController.text) ?? 0;
+
+    double miles = km * 0.621371;
+
+    setState(() {
+      result = miles.toStringAsFixed(3);
+    });
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+
+      appBar: AppBar(
+        title: const Text("KM → Miles Converter"),
+      ),
+
+      body: Padding(
+
+        padding: const EdgeInsets.all(20),
+
+        child: Column(
+
+          mainAxisAlignment: MainAxisAlignment.center,
+
+          children: [
+
+            TextField(
+              controller: kmController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: "Kilometers",
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            const SizedBox(height:20),
+
+            ElevatedButton(
+              onPressed: convert,
+              child: const Text("Convert"),
+            ),
+
+            const SizedBox(height:20),
+
+            Text(
+              "$result miles",
+              style: const TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height:20),
+
+            ElevatedButton(
+              onPressed: (){
+                Navigator.pop(context);
+              },
+              child: const Text("Back to Calculator"),
+            )
+
+          ],
         ),
       ),
     );
