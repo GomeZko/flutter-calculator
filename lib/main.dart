@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart';
+import 'history_page.dart';
 
-void main() => runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseAuth.instance.signInAnonymously();
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -76,12 +85,23 @@ class _HomePageState extends State<MyHomePage> {
 
       answer = eval.toString();
 
+      _saveToHistory(userInput, answer);
+
     }catch(e){
 
       answer = 'Error';
 
     }
 
+  }
+
+  void _saveToHistory(String expression, String result) {
+    final now = DateTime.now();
+    final timestamp =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} '
+        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+    final calculation = '$expression = $result';
+    HistoryDB.insert(calculation, timestamp);
   }
 
   bool isOperator(String x){
@@ -102,6 +122,19 @@ class _HomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text("Calculator"),
         actions: [
+
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: 'History',
+            onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HistoryPage(),
+                ),
+              );
+            },
+          ),
 
           IconButton(
             icon: const Icon(Icons.swap_horiz),
